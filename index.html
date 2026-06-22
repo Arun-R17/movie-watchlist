@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🎬 Movie Watch List</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#c084fc" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="CineTrack" />
 </head>
 <body>
 
@@ -12,7 +16,11 @@
   <header>
     <div class="header-inner">
       <div class="logo">🎬 CineTrack</div>
-      <button class="btn-add" onclick="openModal()">+ Add Movie</button>
+      <div class="header-btns">
+        <button class="btn-bulk" onclick="document.getElementById('csvFileInput').click()">📁 Import CSV</button>
+        <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCSVUpload(event)" />
+        <button class="btn-add" onclick="openModal()">+ Add Movie</button>
+      </div>
     </div>
   </header>
 
@@ -52,16 +60,19 @@
     </div>
   </div>
 
+  <!-- IMPORT STATUS BANNER -->
+  <div id="importBanner" style="display:none"></div>
+
   <!-- MOVIE GRID -->
   <main>
     <div class="movie-grid" id="movieGrid"></div>
     <div class="empty-state" id="emptyState" style="display:none;">
       <p>🎥 No movies yet!</p>
-      <span>Click "+ Add Movie" to get started</span>
+      <span>Click "+ Add Movie" or "📁 Import CSV" to get started</span>
     </div>
   </main>
 
-  <!-- MODAL -->
+  <!-- ADD/EDIT MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
     <div class="modal">
       <div class="modal-header">
@@ -116,5 +127,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/movie-watchlist/sw.js')
+        .then(() => console.log('SW registered!'))
+        .catch(err => console.log('SW error:', err));
+    }
+  </script>
 </body>
 </html>
