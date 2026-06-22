@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎬 Movie Watch List</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">🎬 CineTrack</div>
+      <button class="btn-add" onclick="openModal()">+ Add Movie</button>
+    </div>
+  </header>
+
+  <!-- SEARCH & FILTER -->
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍 Search movies..." oninput="renderMovies()" />
+    <select id="filterGenre" onchange="renderMovies()">
+      <option value="All">All Genres</option>
+      <option value="Action">Action</option>
+      <option value="Comedy">Comedy</option>
+      <option value="Drama">Drama</option>
+      <option value="Horror">Horror</option>
+      <option value="Romance">Romance</option>
+      <option value="Sci-Fi">Sci-Fi</option>
+      <option value="Thriller">Thriller</option>
+    </select>
+    <select id="filterStatus" onchange="renderMovies()">
+      <option value="All">All Status</option>
+      <option value="Watched">Watched</option>
+      <option value="Unwatched">Unwatched</option>
+    </select>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <span id="totalCount">0</span>
+      <label>Total</label>
+    </div>
+    <div class="stat-card watched-stat">
+      <span id="watchedCount">0</span>
+      <label>Watched</label>
+    </div>
+    <div class="stat-card unwatched-stat">
+      <span id="unwatchedCount">0</span>
+      <label>Unwatched</label>
+    </div>
+  </div>
+
+  <!-- MOVIE GRID -->
+  <main>
+    <div class="movie-grid" id="movieGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <p>🎥 No movies yet!</p>
+      <span>Click "+ Add Movie" to get started</span>
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add Movie</h2>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="movieId" />
+
+        <label>Movie Title *</label>
+        <input type="text" id="movieTitle" placeholder="e.g. Vikram" />
+
+        <label>Genre</label>
+        <select id="movieGenre">
+          <option value="Action">Action</option>
+          <option value="Comedy">Comedy</option>
+          <option value="Drama">Drama</option>
+          <option value="Horror">Horror</option>
+          <option value="Romance">Romance</option>
+          <option value="Sci-Fi">Sci-Fi</option>
+          <option value="Thriller">Thriller</option>
+        </select>
+
+        <label>Rating</label>
+        <div class="star-input" id="starInput">
+          <span onclick="setRating(1)">★</span>
+          <span onclick="setRating(2)">★</span>
+          <span onclick="setRating(3)">★</span>
+          <span onclick="setRating(4)">★</span>
+          <span onclick="setRating(5)">★</span>
+        </div>
+
+        <label>Status</label>
+        <div class="toggle-row">
+          <span>Unwatched</span>
+          <label class="toggle">
+            <input type="checkbox" id="movieWatched" />
+            <span class="slider"></span>
+          </label>
+          <span>Watched</span>
+        </div>
+
+        <label>Notes (optional)</label>
+        <textarea id="movieNotes" placeholder="Your thoughts..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" onclick="saveMovie()">Save Movie</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>
