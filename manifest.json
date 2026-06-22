@@ -2,21 +2,25 @@
   "name": "CineTrack - Movie Watchlist",
   "short_name": "CineTrack",
   "description": "Track your movies easily!",
-  "start_url": "/movie-watchlist/",
+  "start_url": "/movie-watchlist/index.html",
+  "scope": "/movie-watchlist/",
   "display": "standalone",
   "background_color": "#0f0f13",
   "theme_color": "#c084fc",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "categories": ["entertainment"],
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
