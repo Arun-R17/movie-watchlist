@@ -8,16 +8,105 @@ let movies = [];
 let currentRating = 0;
 let editingId = null;
 
-// ===== LOAD MOVIES FROM SUPABASE =====
+// ===== LOAD MOVIES =====
 async function loadMovies() {
   const { data, error } = await _supabase
     .from('movies')
     .select('*')
     .order('id', { ascending: false });
-
   if (error) { console.error('Load error:', error); return; }
   movies = data || [];
   renderMovies();
+}
+
+// ===== CSV UPLOAD =====
+async function handleCSVUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  showBanner('⏳ Uploading...', 'loading');
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const text = e.target.result;
+    const lines = text.trim().split('\n');
+    const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+    const dataLines = lines.slice(1).filter(l => l.trim());
+
+    if (dataLines.length === 0) {
+      showBanner('❌ CSV empty-ஆ இருக்கு!', 'error');
+      return;
+    }
+
+    const today = new Date().toLocaleDateString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric'
+    });
+
+    const moviesData = dataLines.map(line => {
+      const values = line.split(',').map(v => v.trim());
+      const get = (key) => {
+        const idx = headers.indexOf(key);
+        return idx !== -1 ? values[idx] || '' : '';
+      };
+      return {
+        title:   get('title'),
+        genre:   get('genre')  || 'Action',
+        rating:  parseInt(get('rating')) || 0,
+        watched: get('watched').toLowerCase() === 'true',
+        notes:   get('notes')  || '',
+        date:    today
+      };
+    }).filter(m => m.title);
+
+    if (moviesData.length === 0) {
+      showBanner('❌ Valid data இல்ல!', 'error');
+      return;
+    }
+
+    const { error } = await _supabase.from('movies').insert(moviesData);
+    event.target.value = '';
+
+    if (error) {
+      console.error('CSV error:', error);
+      showBanner('❌ Upload failed! ' + error.message, 'error');
+      return;
+    }
+
+    showBanner(`✅ ${moviesData.length} movies added!`, 'success');
+    await loadMovies();
+  };
+
+  reader.readAsText(file);
+}
+
+// ===== BANNER =====
+function showBanner(msg, type) {
+  const banner = document.getElementById('importBanner');
+  banner.textContent = msg;
+  banner.style.display = 'block';
+  banner.style.padding = '12px 24px';
+  banner.style.textAlign = 'center';
+  banner.style.fontWeight = '600';
+  banner.style.fontSize = '0.95rem';
+  banner.style.maxWidth = '1100px';
+  banner.style.margin = '12px auto 0';
+  banner.style.borderRadius = '8px';
+
+  if (type === 'success') {
+    banner.style.background = 'rgba(52,211,153,0.15)';
+    banner.style.color = '#34d399';
+    banner.style.border = '1px solid #34d399';
+    setTimeout(() => banner.style.display = 'none', 4000);
+  } else if (type === 'error') {
+    banner.style.background = 'rgba(248,113,113,0.15)';
+    banner.style.color = '#f87171';
+    banner.style.border = '1px solid #f87171';
+    setTimeout(() => banner.style.display = 'none', 4000);
+  } else {
+    banner.style.background = 'rgba(192,132,252,0.15)';
+    banner.style.color = '#c084fc';
+    banner.style.border = '1px solid #c084fc';
+  }
 }
 
 // ===== RENDER MOVIES =====
@@ -37,7 +126,6 @@ function renderMovies() {
 
   const grid  = document.getElementById('movieGrid');
   const empty = document.getElementById('emptyState');
-
   grid.innerHTML = '';
 
   if (filtered.length === 0) {
@@ -46,7 +134,6 @@ function renderMovies() {
     empty.style.display = 'none';
     filtered.forEach(m => grid.appendChild(createCard(m)));
   }
-
   updateStats();
 }
 
@@ -95,11 +182,11 @@ function updateStats() {
 function openModal() {
   editingId = null;
   currentRating = 0;
-  document.getElementById('modalTitle').textContent       = 'Add Movie';
-  document.getElementById('movieTitle').value             = '';
-  document.getElementById('movieGenre').value             = 'Action';
-  document.getElementById('movieNotes').value             = '';
-  document.getElementById('movieWatched').checked         = false;
+  document.getElementById('modalTitle').textContent   = 'Add Movie';
+  document.getElementById('movieTitle').value         = '';
+  document.getElementById('movieGenre').value         = 'Action';
+  document.getElementById('movieNotes').value         = '';
+  document.getElementById('movieWatched').checked     = false;
   updateStarUI(0);
   document.getElementById('modalOverlay').classList.add('active');
   document.getElementById('movieTitle').focus();
@@ -111,11 +198,11 @@ function openEdit(id) {
   if (!movie) return;
   editingId = id;
   currentRating = movie.rating;
-  document.getElementById('modalTitle').textContent       = 'Edit Movie';
-  document.getElementById('movieTitle').value             = movie.title;
-  document.getElementById('movieGenre').value             = movie.genre;
-  document.getElementById('movieNotes').value             = movie.notes || '';
-  document.getElementById('movieWatched').checked         = movie.watched;
+  document.getElementById('modalTitle').textContent   = 'Edit Movie';
+  document.getElementById('movieTitle').value         = movie.title;
+  document.getElementById('movieGenre').value         = movie.genre;
+  document.getElementById('movieNotes').value         = movie.notes || '';
+  document.getElementById('movieWatched').checked     = movie.watched;
   updateStarUI(movie.rating);
   document.getElementById('modalOverlay').classList.add('active');
 }
@@ -129,7 +216,7 @@ function closeModalOutside(e) {
   if (e.target.id === 'modalOverlay') closeModal();
 }
 
-// ===== SAVE MOVIE (CREATE / UPDATE) =====
+// ===== SAVE MOVIE =====
 async function saveMovie() {
   const title   = document.getElementById('movieTitle').value.trim();
   const genre   = document.getElementById('movieGenre').value;
@@ -144,26 +231,18 @@ async function saveMovie() {
   }
 
   const movieData = {
-    title,
-    genre,
-    notes,
-    watched,
+    title, genre, notes, watched,
     rating: currentRating,
-    date: new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })
+    date: new Date().toLocaleDateString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric'
+    })
   };
 
   if (editingId) {
-    // UPDATE
-    const { error } = await _supabase
-      .from('movies')
-      .update(movieData)
-      .eq('id', editingId);
+    const { error } = await _supabase.from('movies').update(movieData).eq('id', editingId);
     if (error) { console.error('Update error:', error); return; }
   } else {
-    // CREATE
-    const { error } = await _supabase
-      .from('movies')
-      .insert([movieData]);
+    const { error } = await _supabase.from('movies').insert([movieData]);
     if (error) { console.error('Insert error:', error); return; }
   }
 
@@ -174,20 +253,15 @@ async function saveMovie() {
 // ===== DELETE MOVIE =====
 async function deleteMovie(id) {
   if (!confirm('Delete this movie?')) return;
-  const { error } = await _supabase
-    .from('movies')
-    .delete()
-    .eq('id', id);
+  const { error } = await _supabase.from('movies').delete().eq('id', id);
   if (error) { console.error('Delete error:', error); return; }
   await loadMovies();
 }
 
-// ===== TOGGLE WATCH STATUS =====
+// ===== TOGGLE WATCH =====
 async function toggleWatch(id, currentStatus) {
   const { error } = await _supabase
-    .from('movies')
-    .update({ watched: !currentStatus })
-    .eq('id', id);
+    .from('movies').update({ watched: !currentStatus }).eq('id', id);
   if (error) { console.error('Toggle error:', error); return; }
   await loadMovies();
 }
