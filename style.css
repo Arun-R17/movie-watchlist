@@ -53,6 +53,30 @@ header {
   letter-spacing: -0.5px;
 }
 
+.header-btns { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.user-email {
+  font-size: 0.8rem;
+  color: var(--muted);
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+
 .btn-add {
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   color: white;
