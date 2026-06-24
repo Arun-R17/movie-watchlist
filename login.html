@@ -243,7 +243,7 @@
     async function handleLogin() {
       const email    = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
-      if (!email || !password) { showMessage('Email & Password போடுங்க!', 'error'); return; }
+      if (!email || !password) { showMessage('Enter Email and Password!', 'error'); return; }
 
       const { error } = await _supabase.auth.signInWithPassword({ email, password });
       if (error) { showMessage('❌ ' + error.message, 'error'); return; }
@@ -256,8 +256,8 @@
       const email    = document.getElementById('signupEmail').value.trim();
       const password = document.getElementById('signupPassword').value;
 
-      if (!name)     { showMessage('பேரு போடுங்க!', 'error'); return; }
-      if (!email)    { showMessage('Email போடுங்க!', 'error'); return; }
+      if (!name)     { showMessage('Enter Name!', 'error'); return; }
+      if (!email)    { showMessage('Enter Email!', 'error'); return; }
       if (password.length < 6) { showMessage('Password min 6 characters!', 'error'); return; }
 
       const { error } = await _supabase.auth.signUp({
