@@ -7,16 +7,52 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let movies = [];
 let currentRating = 0;
 let editingId = null;
+let currentUser = null;
+
+// ===== AUTH CHECK =====
+async function checkAuth() {
+  const { data } = await _supabase.auth.getSession();
+  if (!data.session) {
+    window.location.href = 'login.html';
+    return;
+  }
+  currentUser = data.session.user;
+
+  // Show user email in header
+  document.getElementById('userEmail').textContent = currentUser.email;
+  await loadMovies();
+}
+
+// ===== LOGOUT =====
+async function handleLogout() {
+  await _supabase.auth.signOut();
+  window.location.href = 'login.html';
+}
 
 // ===== LOAD MOVIES =====
 async function loadMovies() {
   const { data, error } = await _supabase
     .from('movies')
     .select('*')
+    .eq('user_id', currentUser.id)
     .order('id', { ascending: false });
   if (error) { console.error('Load error:', error); return; }
   movies = data || [];
   renderMovies();
+}
+
+// ===== GENRE ICONS =====
+function getGenreIcon(genre) {
+  const icons = {
+    'Action':   '💥',
+    'Comedy':   '😂',
+    'Drama':    '🎭',
+    'Horror':   '👻',
+    'Romance':  '❤️',
+    'Sci-Fi':   '🚀',
+    'Thriller': '🔪'
+  };
+  return icons[genre] || '🎬';
 }
 
 // ===== CSV UPLOAD =====
@@ -54,7 +90,8 @@ async function handleCSVUpload(event) {
         rating:  parseInt(get('rating')) || 0,
         watched: get('watched').toLowerCase() === 'true',
         notes:   get('notes')  || '',
-        date:    today
+        date:    today,
+        user_id: currentUser.id
       };
     }).filter(m => m.title);
 
@@ -135,20 +172,6 @@ function renderMovies() {
     filtered.forEach(m => grid.appendChild(createCard(m)));
   }
   updateStats();
-}
-
-// ===== GENRE ICONS =====
-function getGenreIcon(genre) {
-  const icons = {
-    'Action':   '💥',
-    'Comedy':   '😂',
-    'Drama':    '🎭',
-    'Horror':   '👻',
-    'Romance':  '❤️',
-    'Sci-Fi':   '🚀',
-    'Thriller': '🔪'
-  };
-  return icons[genre] || '🎬';
 }
 
 // ===== CREATE CARD =====
@@ -247,6 +270,7 @@ async function saveMovie() {
   const movieData = {
     title, genre, notes, watched,
     rating: currentRating,
+    user_id: currentUser.id,
     date: new Date().toLocaleDateString('en-IN', {
       day: '2-digit', month: 'short', year: 'numeric'
     })
@@ -297,4 +321,4 @@ document.addEventListener('keydown', e => {
 });
 
 // ===== INIT =====
-loadMovies();
+checkAuth();
