@@ -137,6 +137,20 @@ function renderMovies() {
   updateStats();
 }
 
+// ===== GENRE ICONS =====
+function getGenreIcon(genre) {
+  const icons = {
+    'Action':   '💥',
+    'Comedy':   '😂',
+    'Drama':    '🎭',
+    'Horror':   '👻',
+    'Romance':  '❤️',
+    'Sci-Fi':   '🚀',
+    'Thriller': '🔪'
+  };
+  return icons[genre] || '🎬';
+}
+
 // ===== CREATE CARD =====
 function createCard(movie) {
   const card = document.createElement('div');
@@ -153,7 +167,7 @@ function createCard(movie) {
         ${movie.watched ? '✅ Watched' : '🎞 Unwatched'}
       </span>
     </div>
-    <div class="genre-tag">🎭 ${movie.genre}</div>
+    <div class="genre-tag">${getGenreIcon(movie.genre)} ${movie.genre}</div>
     <div class="stars">${stars}</div>
     ${movie.notes ? `<div class="notes-text">"${movie.notes}"</div>` : ''}
     <div class="card-date">📅 Added: ${movie.date}</div>
