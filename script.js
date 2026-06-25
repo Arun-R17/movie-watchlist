@@ -296,6 +296,7 @@ function updateStats() {
   document.getElementById('watchedBadge').textContent = watched;
   document.getElementById('unwatchedBadge').textContent = unwatched;
   renderTopRatedMovies();
+  renderGenreChart();
 }
 function renderTopRatedMovies() {
   const container = document.getElementById('topRatedMovies');
@@ -396,6 +397,46 @@ function updateStarUI(val) {
 
 // ===== KEYBOARD =====
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+let genreChart;
 
+function renderGenreChart() {
+
+  const genres = {};
+
+  movies.forEach(movie => {
+    genres[movie.genre] = (genres[movie.genre] || 0) + 1;
+  });
+
+  const labels = Object.keys(genres);
+  const values = Object.values(genres);
+
+  const ctx = document.getElementById('genreChart');
+
+  if (!ctx) return;
+
+  if (genreChart) {
+    genreChart.destroy();
+  }
+
+  genreChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: values
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: {
+            color: '#fff'
+          }
+        }
+      }
+    }
+  });
+}
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => checkAuth());
