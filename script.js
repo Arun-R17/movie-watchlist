@@ -36,6 +36,29 @@ async function handleLogout() {
   window.location.href = 'login.html';
 }
 
+// ===== AUTO FETCH MISSING POSTERS =====
+async function fetchMissingPosters() {
+  const missing = movies.filter(m => !m.poster_url);
+  if (missing.length === 0) return;
+
+  console.log(`Fetching posters for ${missing.length} movies...`);
+
+  for (const movie of missing) {
+    const posterUrl = await fetchMoviePoster(movie.title);
+    if (posterUrl) {
+      await _supabase
+        .from('movies')
+        .update({ poster_url: posterUrl })
+        .eq('id', movie.id);
+      // Update local state
+      movie.poster_url = posterUrl;
+      // Re-render that card
+      renderMovies();
+    }
+  }
+  console.log('Poster fetch complete!');
+}
+
 // ===== LOAD MOVIES =====
 async function loadMovies() {
   const { data, error } = await _supabase
@@ -46,12 +69,17 @@ async function loadMovies() {
   if (error) { console.error('Load error:', error); return; }
   movies = data || [];
   renderMovies();
+  // Background-ல posters fetch பண்றோம்
+  fetchMissingPosters();
 }
 
 // ===== WIKIPEDIA POSTER SEARCH =====
 async function fetchMoviePoster(title) {
-  // Try multiple search queries
   const queries = [
+    `${title} 2024 film`,
+    `${title} 2023 film`,
+    `${title} 2022 film`,
+    `${title} 2021 film`,
     `${title} film`,
     `${title} movie`,
     title
@@ -59,27 +87,31 @@ async function fetchMoviePoster(title) {
 
   for (const query of queries) {
     try {
-      // Search Wikipedia first
-      const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=1`;
-      const searchRes = await fetch(searchUrl);
+      // Step 1: Search Wikipedia
+      const searchRes = await fetch(
+        `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=1`
+      );
       const searchData = await searchRes.json();
-
       if (!searchData.query.search.length) continue;
 
       const pageTitle = searchData.query.search[0].title;
 
-      // Get poster from page
-      const imgUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages&format=json&pithumbsize=400&origin=*`;
-      const imgRes = await fetch(imgUrl);
+      // Step 2: Get poster using exact page title
+      const imgRes = await fetch(
+        `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages&format=json&pithumbsize=500&origin=*`
+      );
       const imgData = await imgRes.json();
-      const pages = imgData.query.pages;
-      const page = Object.values(pages)[0];
+      const page = Object.values(imgData.query.pages)[0];
 
-      if (page.thumbnail) return page.thumbnail.source;
+      if (page.thumbnail) {
+        console.log('Poster found:', page.thumbnail.source);
+        return page.thumbnail.source;
+      }
     } catch {
       continue;
     }
   }
+  console.log('No poster found for:', title);
   return null;
 }
 
