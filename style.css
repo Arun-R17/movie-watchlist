@@ -676,3 +676,32 @@ input:checked + .slider::before { transform: translateX(20px); }
 #genreChart{
   max-height:300px;
 }
+.movie-detail-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  z-index:9999;
+  justify-content:center;
+  align-items:center;
+}
+
+.movie-detail-content{
+  width:350px;
+  background:#1e2128;
+  padding:20px;
+  border-radius:20px;
+  text-align:center;
+}
+
+.movie-detail-content img{
+  width:200px;
+  border-radius:12px;
+  margin-bottom:15px;
+}
+
+.close-detail{
+  float:right;
+  font-size:28px;
+  cursor:pointer;
+}
