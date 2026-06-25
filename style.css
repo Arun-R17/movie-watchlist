@@ -639,3 +639,30 @@ input:checked + .slider::before { transform: translateX(20px); }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .movie-grid { grid-template-columns: repeat(2, 1fr); }
 }
+.hero-banner{
+  margin:20px 28px;
+  padding:40px;
+  border-radius:20px;
+  background:linear-gradient(135deg,#00d4aa,#7c6af7);
+  color:white;
+}
+
+.hero-banner h1{
+  font-size:2rem;
+  margin-bottom:10px;
+}
+
+.top-rated-section{
+  margin:20px 28px;
+  background:#1e2128;
+  padding:20px;
+  border-radius:16px;
+}
+
+.movie-card{
+  transition:all .3s ease;
+}
+
+.movie-card:hover{
+  transform:translateY(-8px) scale(1.03);
+}
