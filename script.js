@@ -479,14 +479,28 @@ function renderGenreChart() {
     },
     options: {
       responsive: true,
+      onClick: (evt, elements) => {
+
+        if (!elements.length) return;
+
+        const index = elements[0].index;
+
+        const selectedGenre = labels[index];
+
+        filterByGenre(selectedGenre);
+      },
+
       plugins: {
         legend: {
           labels: {
             color: '#fff'
+          },
+
+          onClick: (e, item) => {
+            filterByGenre(item.text);
           }
         }
-      }
-    }
+      }  
   });
 }
 function renderRecentMovies() {
