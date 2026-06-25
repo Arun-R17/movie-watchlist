@@ -70,6 +70,7 @@ async function loadMovies() {
   if (error) { console.error('Load error:', error); return; }
   movies = data || [];
   renderMovies();
+  renderGenreChart();
   // Background-ல posters fetch பண்றோம்
   fetchMissingPosters();
 }
@@ -136,7 +137,9 @@ function filterByGenre(genre) {
     genre === 'All' ? 'All Movies' : `${getGenreIcon(genre)} ${genre}`;
   setActiveNav(genre);
   renderMovies();
+  updateGenreChart();
 }
+
 
 // ===== FILTER BY STATUS =====
 function filterByStatus(status) {
@@ -299,7 +302,7 @@ function updateStats() {
   document.getElementById('watchedBadge').textContent = watched;
   document.getElementById('unwatchedBadge').textContent = unwatched;
   renderTopRatedMovies();
-  renderGenreChart();
+  
   renderRecentMovies();
 }
 function renderTopRatedMovies() {
@@ -492,6 +495,8 @@ function renderGenreChart() {
 
       plugins: {
         legend: {
+          position: 'top',
+          
           labels: {
             color: '#fff'
           },
@@ -504,6 +509,27 @@ function renderGenreChart() {
     }
   });
 }
+function updateGenreChart() {
+  if (!genrechart) return;
+
+  let filteredMovies =
+    activeGenre === 'All'
+      ? movies
+      : movies.filter(movie => movie.genre === activeGenre);
+
+  const genreCounts = {};
+
+  filteredMovies.forEach(movie => {
+    genreCounts[movie.genre] =
+      (genreCounts[movie.genre] || 0) + 1;
+  });
+
+  genreChart.data.labels = Object.keys(genreCounts);
+  genreChart.data.datasets[0].data = Object.values(genreCounts);
+
+  genreChart.update();
+}
+  
 function renderRecentMovies() {
 
   const container = document.getElementById('recentMovies');
