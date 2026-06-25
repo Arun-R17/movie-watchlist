@@ -321,4 +321,4 @@ document.addEventListener('keydown', e => {
 });
 
 // ===== INIT =====
-checkAuth();
+document.addEventListener('DOMContentLoaded', () => checkAuth());
