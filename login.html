@@ -275,7 +275,10 @@
       const { error } = await _supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://arun-r17.github.io/movie-watchlist/index.html'
+          redirectTo: 'https://arun-r17.github.io/movie-watchlist/index.html',
+          queryParams: {
+            prompt: 'select_account'
+          }
         }
       });
       if (error) { showMessage('❌ ' + error.message, 'error'); }
