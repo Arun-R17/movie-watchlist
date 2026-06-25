@@ -8,6 +8,13 @@ let movies = [];
 let currentRating = 0;
 let editingId = null;
 let currentUser = null;
+let activeGenre = 'All';
+let activeStatus = 'All';
+
+// ===== SIDEBAR TOGGLE =====
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
 
 // ===== AUTH CHECK =====
 async function checkAuth() {
@@ -17,9 +24,9 @@ async function checkAuth() {
     return;
   }
   currentUser = data.session.user;
-
-  // Show user email in header
-  document.getElementById('userEmail').textContent = currentUser.email;
+  const email = currentUser.email || '';
+  document.getElementById('userEmail').textContent = email;
+  document.getElementById('userAvatar').textContent = email.charAt(0).toUpperCase();
   await loadMovies();
 }
 
@@ -41,25 +48,53 @@ async function loadMovies() {
   renderMovies();
 }
 
-// ===== GENRE ICONS =====
+// ===== GENRE ICONS & COLORS =====
 function getGenreIcon(genre) {
   const icons = {
-    'Action':   '💥',
-    'Comedy':   '😂',
-    'Drama':    '🎭',
-    'Horror':   '👻',
-    'Romance':  '❤️',
-    'Sci-Fi':   '🚀',
-    'Thriller': '🔪'
+    'Action': '💥', 'Comedy': '😂', 'Drama': '🎭',
+    'Horror': '👻', 'Romance': '❤️', 'Sci-Fi': '🚀', 'Thriller': '🔪'
   };
   return icons[genre] || '🎬';
+}
+
+function getGenreColor(genre) {
+  const colors = {
+    'Action': '#ff6b6b', 'Comedy': '#ffd93d', 'Drama': '#6bcb77',
+    'Horror': '#845ec2', 'Romance': '#ff9a9e', 'Sci-Fi': '#4d96ff', 'Thriller': '#f9c74f'
+  };
+  return colors[genre] || '#00d4aa';
+}
+
+// ===== FILTER BY GENRE =====
+function filterByGenre(genre) {
+  activeGenre = genre;
+  activeStatus = 'All';
+  document.getElementById('filterGenreTop').value = genre;
+  document.getElementById('sectionTitle').textContent =
+    genre === 'All' ? 'All Movies' : `${getGenreIcon(genre)} ${genre}`;
+  setActiveNav(genre);
+  renderMovies();
+}
+
+// ===== FILTER BY STATUS =====
+function filterByStatus(status) {
+  activeStatus = status;
+  activeGenre = 'All';
+  document.getElementById('filterGenreTop').value = 'All';
+  document.getElementById('sectionTitle').textContent =
+    status === 'All' ? 'All Movies' : status === 'Watched' ? '✅ Watched' : '🎞 Unwatched';
+  renderMovies();
+}
+
+// ===== SET ACTIVE NAV =====
+function setActiveNav(genre) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 }
 
 // ===== CSV UPLOAD =====
 async function handleCSVUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-
   showBanner('⏳ Uploading...', 'loading');
 
   const reader = new FileReader();
@@ -69,50 +104,27 @@ async function handleCSVUpload(event) {
     const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
     const dataLines = lines.slice(1).filter(l => l.trim());
 
-    if (dataLines.length === 0) {
-      showBanner('❌ CSV empty-ஆ இருக்கு!', 'error');
-      return;
-    }
+    if (dataLines.length === 0) { showBanner('❌ CSV empty!', 'error'); return; }
 
-    const today = new Date().toLocaleDateString('en-IN', {
-      day: '2-digit', month: 'short', year: 'numeric'
-    });
+    const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
     const moviesData = dataLines.map(line => {
       const values = line.split(',').map(v => v.trim());
-      const get = (key) => {
-        const idx = headers.indexOf(key);
-        return idx !== -1 ? values[idx] || '' : '';
-      };
+      const get = (key) => { const idx = headers.indexOf(key); return idx !== -1 ? values[idx] || '' : ''; };
       return {
-        title:   get('title'),
-        genre:   get('genre')  || 'Action',
-        rating:  parseInt(get('rating')) || 0,
+        title: get('title'), genre: get('genre') || 'Action',
+        rating: parseInt(get('rating')) || 0,
         watched: get('watched').toLowerCase() === 'true',
-        notes:   get('notes')  || '',
-        date:    today,
-        user_id: currentUser.id
+        notes: get('notes') || '', date: today, user_id: currentUser.id
       };
     }).filter(m => m.title);
 
-    if (moviesData.length === 0) {
-      showBanner('❌ Valid data இல்ல!', 'error');
-      return;
-    }
-
     const { error } = await _supabase.from('movies').insert(moviesData);
     event.target.value = '';
-
-    if (error) {
-      console.error('CSV error:', error);
-      showBanner('❌ Upload failed! ' + error.message, 'error');
-      return;
-    }
-
+    if (error) { showBanner('❌ ' + error.message, 'error'); return; }
     showBanner(`✅ ${moviesData.length} movies added!`, 'success');
     await loadMovies();
   };
-
   reader.readAsText(file);
 }
 
@@ -121,47 +133,40 @@ function showBanner(msg, type) {
   const banner = document.getElementById('importBanner');
   banner.textContent = msg;
   banner.style.display = 'block';
-  banner.style.padding = '12px 24px';
-  banner.style.textAlign = 'center';
-  banner.style.fontWeight = '600';
-  banner.style.fontSize = '0.95rem';
-  banner.style.maxWidth = '1100px';
-  banner.style.margin = '12px auto 0';
-  banner.style.borderRadius = '8px';
-
+  banner.className = 'import-banner';
   if (type === 'success') {
-    banner.style.background = 'rgba(52,211,153,0.15)';
-    banner.style.color = '#34d399';
-    banner.style.border = '1px solid #34d399';
+    banner.style.background = 'rgba(0,212,170,0.12)';
+    banner.style.color = '#00d4aa';
+    banner.style.border = '1px solid rgba(0,212,170,0.3)';
     setTimeout(() => banner.style.display = 'none', 4000);
   } else if (type === 'error') {
-    banner.style.background = 'rgba(248,113,113,0.15)';
-    banner.style.color = '#f87171';
-    banner.style.border = '1px solid #f87171';
+    banner.style.background = 'rgba(255,92,92,0.12)';
+    banner.style.color = '#ff5c5c';
+    banner.style.border = '1px solid rgba(255,92,92,0.3)';
     setTimeout(() => banner.style.display = 'none', 4000);
   } else {
-    banner.style.background = 'rgba(192,132,252,0.15)';
-    banner.style.color = '#c084fc';
-    banner.style.border = '1px solid #c084fc';
+    banner.style.background = 'rgba(124,106,247,0.12)';
+    banner.style.color = '#7c6af7';
+    banner.style.border = '1px solid rgba(124,106,247,0.3)';
   }
 }
 
 // ===== RENDER MOVIES =====
 function renderMovies() {
   const search = document.getElementById('searchInput').value.toLowerCase();
-  const genre  = document.getElementById('filterGenre').value;
-  const status = document.getElementById('filterStatus').value;
+  const genreFilter = document.getElementById('filterGenreTop').value;
 
   let filtered = movies.filter(m => {
     const matchSearch = m.title.toLowerCase().includes(search);
-    const matchGenre  = genre === 'All' || m.genre === genre;
-    const matchStatus = status === 'All' ||
-      (status === 'Watched' && m.watched) ||
-      (status === 'Unwatched' && !m.watched);
+    const matchGenre = (activeGenre === 'All' && genreFilter === 'All') ||
+      (genreFilter !== 'All' ? m.genre === genreFilter : m.genre === activeGenre || activeGenre === 'All');
+    const matchStatus = activeStatus === 'All' ||
+      (activeStatus === 'Watched' && m.watched) ||
+      (activeStatus === 'Unwatched' && !m.watched);
     return matchSearch && matchGenre && matchStatus;
   });
 
-  const grid  = document.getElementById('movieGrid');
+  const grid = document.getElementById('movieGrid');
   const empty = document.getElementById('emptyState');
   grid.innerHTML = '';
 
@@ -183,23 +188,30 @@ function createCard(movie) {
     `<span class="${i < movie.rating ? '' : 'empty'}">★</span>`
   ).join('');
 
+  const icon = getGenreIcon(movie.genre);
+  const color = getGenreColor(movie.genre);
+
   card.innerHTML = `
-    <div class="card-top">
-      <div class="movie-title">${movie.title}</div>
-      <span class="badge ${movie.watched ? 'badge-watched' : 'badge-unwatched'}">
+    <div class="card-poster" style="background: linear-gradient(135deg, ${color}22, ${color}11)">
+      <div class="card-poster-bg">${icon}</div>
+      <span style="font-size:3rem;position:relative;z-index:1">${icon}</span>
+      <span class="card-watched-badge ${movie.watched ? 'badge-watched' : 'badge-unwatched'}">
         ${movie.watched ? '✅ Watched' : '🎞 Unwatched'}
       </span>
     </div>
-    <div class="genre-tag">${getGenreIcon(movie.genre)} ${movie.genre}</div>
-    <div class="stars">${stars}</div>
-    ${movie.notes ? `<div class="notes-text">"${movie.notes}"</div>` : ''}
-    <div class="card-date">📅 Added: ${movie.date}</div>
-    <div class="card-actions">
-      <button class="btn-watch" onclick="toggleWatch(${movie.id}, ${movie.watched})">
-        ${movie.watched ? '↩ Mark Unwatched' : '✅ Mark Watched'}
-      </button>
-      <button class="btn-edit" onclick="openEdit(${movie.id})">✏️</button>
-      <button class="btn-delete" onclick="deleteMovie(${movie.id})">🗑️</button>
+    <div class="card-body">
+      <div class="card-title">${movie.title}</div>
+      <div class="card-genre">${icon} ${movie.genre}</div>
+      <div class="card-stars">${stars}</div>
+      ${movie.notes ? `<div class="card-notes">"${movie.notes}"</div>` : ''}
+      <div class="card-date">📅 ${movie.date}</div>
+      <div class="card-actions">
+        <button class="btn-watch" onclick="toggleWatch(${movie.id}, ${movie.watched})">
+          ${movie.watched ? '↩ Unwatch' : '✅ Watched'}
+        </button>
+        <button class="btn-edit" onclick="openEdit(${movie.id})">✏️</button>
+        <button class="btn-delete" onclick="deleteMovie(${movie.id})">🗑️</button>
+      </div>
     </div>
   `;
   return card;
@@ -207,118 +219,102 @@ function createCard(movie) {
 
 // ===== UPDATE STATS =====
 function updateStats() {
-  const total     = movies.length;
-  const watched   = movies.filter(m => m.watched).length;
+  const total = movies.length;
+  const watched = movies.filter(m => m.watched).length;
   const unwatched = total - watched;
-  document.getElementById('totalCount').textContent     = total;
-  document.getElementById('watchedCount').textContent   = watched;
+  const avgRating = total > 0
+    ? (movies.reduce((s, m) => s + (m.rating || 0), 0) / total).toFixed(1)
+    : '0';
+
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('watchedCount').textContent = watched;
   document.getElementById('unwatchedCount').textContent = unwatched;
+  document.getElementById('ratingAvg').textContent = avgRating + '⭐';
+  document.getElementById('watchedBadge').textContent = watched;
+  document.getElementById('unwatchedBadge').textContent = unwatched;
 }
 
-// ===== MODAL OPEN (ADD) =====
+// ===== MODAL OPEN =====
 function openModal() {
-  editingId = null;
-  currentRating = 0;
-  document.getElementById('modalTitle').textContent   = 'Add Movie';
-  document.getElementById('movieTitle').value         = '';
-  document.getElementById('movieGenre').value         = 'Action';
-  document.getElementById('movieNotes').value         = '';
-  document.getElementById('movieWatched').checked     = false;
+  editingId = null; currentRating = 0;
+  document.getElementById('modalTitle').textContent = 'Add Movie';
+  document.getElementById('movieTitle').value = '';
+  document.getElementById('movieGenre').value = 'Action';
+  document.getElementById('movieNotes').value = '';
+  document.getElementById('movieWatched').checked = false;
   updateStarUI(0);
   document.getElementById('modalOverlay').classList.add('active');
   document.getElementById('movieTitle').focus();
 }
 
-// ===== MODAL OPEN (EDIT) =====
+// ===== MODAL EDIT =====
 function openEdit(id) {
   const movie = movies.find(m => m.id === id);
   if (!movie) return;
-  editingId = id;
-  currentRating = movie.rating;
-  document.getElementById('modalTitle').textContent   = 'Edit Movie';
-  document.getElementById('movieTitle').value         = movie.title;
-  document.getElementById('movieGenre').value         = movie.genre;
-  document.getElementById('movieNotes').value         = movie.notes || '';
-  document.getElementById('movieWatched').checked     = movie.watched;
+  editingId = id; currentRating = movie.rating;
+  document.getElementById('modalTitle').textContent = 'Edit Movie';
+  document.getElementById('movieTitle').value = movie.title;
+  document.getElementById('movieGenre').value = movie.genre;
+  document.getElementById('movieNotes').value = movie.notes || '';
+  document.getElementById('movieWatched').checked = movie.watched;
   updateStarUI(movie.rating);
   document.getElementById('modalOverlay').classList.add('active');
 }
 
 // ===== MODAL CLOSE =====
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('active');
-}
-
-function closeModalOutside(e) {
-  if (e.target.id === 'modalOverlay') closeModal();
-}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+function closeModalOutside(e) { if (e.target.id === 'modalOverlay') closeModal(); }
 
 // ===== SAVE MOVIE =====
 async function saveMovie() {
-  const title   = document.getElementById('movieTitle').value.trim();
-  const genre   = document.getElementById('movieGenre').value;
-  const notes   = document.getElementById('movieNotes').value.trim();
+  const title = document.getElementById('movieTitle').value.trim();
+  const genre = document.getElementById('movieGenre').value;
+  const notes = document.getElementById('movieNotes').value.trim();
   const watched = document.getElementById('movieWatched').checked;
 
   if (!title) {
-    document.getElementById('movieTitle').focus();
-    document.getElementById('movieTitle').style.borderColor = '#f87171';
+    document.getElementById('movieTitle').style.borderColor = '#ff5c5c';
     setTimeout(() => document.getElementById('movieTitle').style.borderColor = '', 1500);
     return;
   }
 
   const movieData = {
-    title, genre, notes, watched,
-    rating: currentRating,
-    user_id: currentUser.id,
-    date: new Date().toLocaleDateString('en-IN', {
-      day: '2-digit', month: 'short', year: 'numeric'
-    })
+    title, genre, notes, watched, rating: currentRating, user_id: currentUser.id,
+    date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
   };
 
   if (editingId) {
     const { error } = await _supabase.from('movies').update(movieData).eq('id', editingId);
-    if (error) { console.error('Update error:', error); return; }
+    if (error) { console.error(error); return; }
   } else {
     const { error } = await _supabase.from('movies').insert([movieData]);
-    if (error) { console.error('Insert error:', error); return; }
+    if (error) { console.error(error); return; }
   }
-
   closeModal();
   await loadMovies();
 }
 
-// ===== DELETE MOVIE =====
+// ===== DELETE =====
 async function deleteMovie(id) {
   if (!confirm('Delete this movie?')) return;
-  const { error } = await _supabase.from('movies').delete().eq('id', id);
-  if (error) { console.error('Delete error:', error); return; }
+  await _supabase.from('movies').delete().eq('id', id);
   await loadMovies();
 }
 
 // ===== TOGGLE WATCH =====
-async function toggleWatch(id, currentStatus) {
-  const { error } = await _supabase
-    .from('movies').update({ watched: !currentStatus }).eq('id', id);
-  if (error) { console.error('Toggle error:', error); return; }
+async function toggleWatch(id, status) {
+  await _supabase.from('movies').update({ watched: !status }).eq('id', id);
   await loadMovies();
 }
 
 // ===== STAR RATING =====
-function setRating(val) {
-  currentRating = val;
-  updateStarUI(val);
-}
-
+function setRating(val) { currentRating = val; updateStarUI(val); }
 function updateStarUI(val) {
-  const stars = document.querySelectorAll('#starInput span');
-  stars.forEach((s, i) => s.classList.toggle('active', i < val));
+  document.querySelectorAll('#starInput span').forEach((s, i) => s.classList.toggle('active', i < val));
 }
 
 // ===== KEYBOARD =====
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => checkAuth());
