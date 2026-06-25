@@ -297,6 +297,38 @@ function updateStats() {
   document.getElementById('unwatchedBadge').textContent = unwatched;
   renderTopRatedMovies();
   renderGenreChart();
+  function openMovieDetail(id) {
+
+  const movie = movies.find(m => m.id === id);
+
+  if (!movie) return;
+
+  document.getElementById('detailPoster').src =
+    movie.poster_url || '';
+
+  document.getElementById('detailTitle').textContent =
+    movie.title;
+
+  document.getElementById('detailGenre').textContent =
+    '🎭 ' + movie.genre;
+
+  document.getElementById('detailRating').textContent =
+    '⭐ Rating: ' + movie.rating + '/5';
+
+  document.getElementById('detailStatus').textContent =
+    movie.watched ? '✅ Watched' : '🎞 Unwatched';
+
+  document.getElementById('detailNotes').textContent =
+    movie.notes || 'No notes added';
+
+  document.getElementById('movieDetailModal').style.display =
+    'flex';
+}
+
+function closeMovieDetail() {
+  document.getElementById('movieDetailModal').style.display =
+    'none';
+}
 }
 function renderTopRatedMovies() {
   const container = document.getElementById('topRatedMovies');
