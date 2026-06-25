@@ -777,14 +777,18 @@ input:checked + .slider::before { transform: translateX(20px); }
   text-align:center;
   margin-top:8px;
 }
-#genreChart{
-    max-width:400px;
-    max-height:400px;
-    margin:auto;
-}
-.genre-chart-container {
+
+.chart-section {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    width:100%
+    justify-content: center;
+    text-align: center;
+    width:100% 
+    padding: 20px;
+}
+#genreChart{
+    width:350px;
+    height:350px;
+    margin:0 auto;
 }
