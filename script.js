@@ -481,7 +481,6 @@ function renderGenreChart() {
         data: values,
         backgroundColor: labels.map(genre => getGenreColor(genre))
       }]
-      }]
     },
     options: {
       responsive: true,
@@ -510,8 +509,8 @@ function renderGenreChart() {
         }
       }
     }
-  });
-}
+      });
+    }
 function updateGenreChart() {
   if (!genreChart) return;
 
