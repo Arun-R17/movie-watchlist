@@ -10,6 +10,7 @@ let editingId = null;
 let currentUser = null;
 let activeGenre = 'All';
 let activeStatus = 'All';
+let recentlyViewed = [];
 
 // ===== SIDEBAR TOGGLE =====
 function toggleSidebar() {
@@ -475,7 +476,7 @@ function renderRecentMovies() {
 
   if (!container) return;
 
-  const recent = [...movies].slice(0, 10);
+  const recent = recentlyViewed;
 
   container.innerHTML = recent.map(movie => `
     <div class="recent-poster"
@@ -491,6 +492,13 @@ function openMovieDetail(id) {
   const movie = movies.find(m => m.id === id);
 
   if (!movie) return;
+  recentlyViewed = recentlyViewed.filter(m => m.id !== id);
+
+  recentlyViewed.unshift(movie);
+
+  recentlyViewed = recentlyViewed.slice(0, 10);
+
+  renderRecentMovies();
 
   document.getElementById('detailPoster').src =
     movie.poster_url || '';
