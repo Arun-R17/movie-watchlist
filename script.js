@@ -50,16 +50,37 @@ async function loadMovies() {
 
 // ===== WIKIPEDIA POSTER SEARCH =====
 async function fetchMoviePoster(title) {
-  try {
-    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=400&origin=*`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const pages = data.query.pages;
-    const page = Object.values(pages)[0];
-    return page.thumbnail ? page.thumbnail.source : null;
-  } catch {
-    return null;
+  // Try multiple search queries
+  const queries = [
+    `${title} film`,
+    `${title} movie`,
+    title
+  ];
+
+  for (const query of queries) {
+    try {
+      // Search Wikipedia first
+      const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=1`;
+      const searchRes = await fetch(searchUrl);
+      const searchData = await searchRes.json();
+
+      if (!searchData.query.search.length) continue;
+
+      const pageTitle = searchData.query.search[0].title;
+
+      // Get poster from page
+      const imgUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages&format=json&pithumbsize=400&origin=*`;
+      const imgRes = await fetch(imgUrl);
+      const imgData = await imgRes.json();
+      const pages = imgData.query.pages;
+      const page = Object.values(pages)[0];
+
+      if (page.thumbnail) return page.thumbnail.source;
+    } catch {
+      continue;
+    }
   }
+  return null;
 }
 
 // ===== GENRE ICONS & COLORS =====
