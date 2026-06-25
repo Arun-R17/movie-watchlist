@@ -511,7 +511,7 @@ function renderGenreChart() {
   });
 }
 function updateGenreChart() {
-  if (!genrechart) return;
+  if (!genreChart) return;
 
   let filteredMovies =
     activeGenre === 'All'
