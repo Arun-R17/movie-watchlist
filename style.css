@@ -666,3 +666,13 @@ input:checked + .slider::before { transform: translateX(20px); }
 .movie-card:hover{
   transform:translateY(-8px) scale(1.03);
 }
+.chart-section{
+  margin:20px 28px;
+  background:#1e2128;
+  padding:20px;
+  border-radius:16px;
+}
+
+#genreChart{
+  max-height:300px;
+}
