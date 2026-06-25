@@ -75,19 +75,36 @@ async function loadMovies() {
 
 async function fetchMoviePoster(title) {
   try {
-    const response = await fetch(
+    let response = await fetch(
       `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=5fabe342`
     );
 
-    const data = await response.json();
+    let data = await response.json();
 
-    if (data.Response === "True" && data.Poster !== "N/A") {
-      return data.Poster;
+    // Exact match kidaikkalana search pannu
+    if (data.Response !== "True") {
+      response = await fetch(
+        `https://www.omdbapi.com/?s=${encodeURIComponent(title)}&apikey=5fabe342`
+      );
+
+      data = await response.json();
+
+      if (
+        data.Response === "True" &&
+        data.Search &&
+        data.Search.length > 0
+      ) {
+        return data.Search[0].Poster !== "N/A"
+          ? data.Search[0].Poster
+          : null;
+      }
+
+      return null;
     }
 
-    return null;
+    return data.Poster !== "N/A" ? data.Poster : null;
   } catch (error) {
-    console.error("Poster fetch error:", error);
+    console.error(error);
     return null;
   }
 }
