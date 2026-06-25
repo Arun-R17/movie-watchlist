@@ -738,3 +738,42 @@ input:checked + .slider::before { transform: translateX(20px); }
   height:100%;
   object-fit:cover;
 }
+#topRatedMovies{
+  display:flex;
+  gap:15px;
+  overflow-x:auto;
+  padding:10px 0;
+}
+
+.top-movie-card{
+  min-width:160px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.top-movie-card:hover{
+  transform:scale(1.05);
+}
+
+.top-movie-card img{
+  width:160px;
+  height:220px;
+  object-fit:cover;
+  border-radius:12px;
+}
+
+.top-no-poster{
+  width:160px;
+  height:220px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#333;
+  border-radius:12px;
+  font-size:3rem;
+}
+
+.top-movie-info{
+  text-align:center;
+  margin-top:8px;
+}
