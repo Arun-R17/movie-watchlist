@@ -502,7 +502,8 @@ function renderGenreChart() {
         }
       }
     }
-  }
+  });
+}
 function renderRecentMovies() {
 
   const container = document.getElementById('recentMovies');
