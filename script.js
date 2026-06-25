@@ -479,12 +479,12 @@ function renderGenreChart() {
     },
     options: {
       responsive: true,
+
       onClick: (evt, elements) => {
 
         if (!elements.length) return;
 
         const index = elements[0].index;
-
         const selectedGenre = labels[index];
 
         filterByGenre(selectedGenre);
@@ -500,9 +500,9 @@ function renderGenreChart() {
             filterByGenre(item.text);
           }
         }
-      }  
-  });
-}
+      }
+    }
+  }
 function renderRecentMovies() {
 
   const container = document.getElementById('recentMovies');
