@@ -295,6 +295,21 @@ function updateStats() {
   document.getElementById('ratingAvg').textContent = avgRating + '⭐';
   document.getElementById('watchedBadge').textContent = watched;
   document.getElementById('unwatchedBadge').textContent = unwatched;
+  renderTopRatedMovies();
+}
+function renderTopRatedMovies() {
+  const container = document.getElementById('topRatedMovies');
+  if (!container) return;
+
+  const top = [...movies]
+    .sort((a,b) => b.rating - a.rating)
+    .slice(0,3);
+
+  container.innerHTML = top.map((m,i)=>`
+    <div style="padding:10px;border-bottom:1px solid #333">
+      ${i+1}. ${m.title} ⭐ ${m.rating}/5
+    </div>
+  `).join('');
 }
 
 // ===== MODAL OPEN =====
