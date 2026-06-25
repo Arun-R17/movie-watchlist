@@ -309,8 +309,13 @@ function renderTopRatedMovies() {
   if (!container) return;
 
   const top = [...movies]
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 10);
+  .sort((a, b) => {
+    if (b.rating !== a.rating) {
+      return b.rating - a.rating;
+    }
+    return b.id - a.id;
+  })
+  .slice(0, 10);
 
   container.innerHTML = top.map(movie => `
     <div class="top-movie-card"
