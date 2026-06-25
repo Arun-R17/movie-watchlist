@@ -458,6 +458,23 @@ function renderGenreChart() {
     }
   });
 }
+function renderRecentMovies() {
+
+  const container = document.getElementById('recentMovies');
+
+  if (!container) return;
+
+  const recent = [...movies].slice(0, 10);
+
+  container.innerHTML = recent.map(movie => `
+    <div class="recent-poster"
+         onclick="openMovieDetail(${movie.id})">
+
+      <img src="${movie.poster_url || 'https://via.placeholder.com/140x200?text=Movie'}"
+           alt="${movie.title}">
+    </div>
+  `).join('');
+}
 function openMovieDetail(id) {
 
   const movie = movies.find(m => m.id === id);
