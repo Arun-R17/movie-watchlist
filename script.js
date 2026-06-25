@@ -327,8 +327,19 @@ function renderRecentMovies() {
     <div class="recent-poster"
          onclick="openMovieDetail(${movie.id})">
 
-      <img src="${movie.poster_url || 'https://via.placeholder.com/140x200?text=Movie'}"
-           alt="${movie.title}">
+      ${
+        movie.poster_url
+        ? `<img src="${movie.poster_url}" alt="${movie.title}">`
+        : `<div style="
+            height:200px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#333;
+            font-size:3rem;
+          ">🎬</div>`
+      }
+
     </div>
   `).join('');
 }
