@@ -75,19 +75,20 @@ async function loadMovies() {
 
 // ===== WIKIPEDIA POSTER SEARCH =====
 async function fetchMoviePoster(title) {
-  const queries = [
-    `${title} 2024 film`,
-    `${title} 2023 film`,
-    `${title} 2022 film`,
-    `${title} 2021 film`,
-    `${title} film`,
-    `${title} movie`,
-    title
-  ];
+  const currentYear = new Date().getFullYear();
+  const queries = [];
+
+  // Add year-based queries
+  for (let y = currentYear; y >= currentYear - 5; y--) {
+    queries.push(`${title} (${y} film)`);
+    queries.push(`${title} ${y} film`);
+  }
+  queries.push(`${title} film`);
+  queries.push(`${title} movie`);
+  queries.push(title);
 
   for (const query of queries) {
     try {
-      // Step 1: Search Wikipedia
       const searchRes = await fetch(
         `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=1`
       );
@@ -96,7 +97,11 @@ async function fetchMoviePoster(title) {
 
       const pageTitle = searchData.query.search[0].title;
 
-      // Step 2: Get poster using exact page title
+      // Must be a film page
+      if (!pageTitle.toLowerCase().includes('film') &&
+          !pageTitle.toLowerCase().includes('movie') &&
+          !pageTitle.toLowerCase().includes(title.toLowerCase())) continue;
+
       const imgRes = await fetch(
         `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages&format=json&pithumbsize=500&origin=*`
       );
@@ -104,16 +109,16 @@ async function fetchMoviePoster(title) {
       const page = Object.values(imgData.query.pages)[0];
 
       if (page.thumbnail) {
-        console.log('Poster found:', page.thumbnail.source);
+        console.log(`✅ Poster found for "${title}":`, page.thumbnail.source);
         return page.thumbnail.source;
       }
-      // Small delay before next attempt
-      await new Promise(r => setTimeout(r, 1000));
+
+      await new Promise(r => setTimeout(r, 500));
     } catch {
       continue;
     }
   }
-  console.log('No poster found for:', title);
+  console.log(`❌ No poster found for: ${title}`);
   return null;
 }
 
