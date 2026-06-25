@@ -113,6 +113,10 @@
       <h2>🏆 Top Rated Movies</h2>
       <div id="topRatedMovies"></div>
     </div>
+    <div class="chart-section">
+      <h2>📊 Genre Distribution</h2>
+      <canvas id="genreChart"></canvas>
+    </div>
 
     <!-- SECTION TITLE -->
     <div class="section-header">
@@ -195,5 +199,6 @@
         .catch(err => console.log('SW error:', err));
     }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
