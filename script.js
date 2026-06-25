@@ -303,16 +303,30 @@ function updateStats() {
   renderRecentMovies();
 }
 function renderTopRatedMovies() {
+
   const container = document.getElementById('topRatedMovies');
+
   if (!container) return;
 
   const top = [...movies]
-    .sort((a,b) => b.rating - a.rating)
-    .slice(0,3);
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 10);
 
-  container.innerHTML = top.map((m,i)=>`
-    <div style="padding:10px;border-bottom:1px solid #333">
-      ${i+1}. ${m.title} ⭐ ${m.rating}/5
+  container.innerHTML = top.map(movie => `
+    <div class="top-movie-card"
+         onclick="openMovieDetail(${movie.id})">
+
+      ${
+        movie.poster_url
+        ? `<img src="${movie.poster_url}" alt="${movie.title}">`
+        : `<div class="top-no-poster">🎬</div>`
+      }
+
+      <div class="top-movie-info">
+        <h4>${movie.title}</h4>
+        <p>⭐ ${movie.rating}/5</p>
+      </div>
+
     </div>
   `).join('');
 }
