@@ -256,7 +256,9 @@ function createCard(movie) {
     : `<div class="card-poster-bg">${icon}</div><span style="font-size:3rem;position:relative;z-index:1">${icon}</span>`;
 
   card.innerHTML = `
-    <div class="card-poster" style="background: linear-gradient(135deg, ${color}22, ${color}11)">
+    <div class="card-poster"
+     onclick="openMovieDetail(${movie.id})"
+     style="background: linear-gradient(135deg, ${color}22, ${color}11); cursor:pointer;">
       ${posterContent}
       <span class="card-watched-badge ${movie.watched ? 'badge-watched' : 'badge-unwatched'}">
         ${movie.watched ? '✅ Watched' : '🎞 Unwatched'}
