@@ -478,7 +478,9 @@ function renderGenreChart() {
     data: {
       labels,
       datasets: [{
-        data: values
+        data: values,
+        backgroundColor: labels.map(genre => getGenreColor(genre))
+      }]
       }]
     },
     options: {
@@ -527,7 +529,8 @@ function updateGenreChart() {
 
   genreChart.data.labels = Object.keys(genreCounts);
   genreChart.data.datasets[0].data = Object.values(genreCounts);
-
+  genreChart.data.datasets[0].backgroundColor =
+    Object.keys(genreCounts).map(genre => getGenreColor(genre));
   genreChart.update();
 }
   
