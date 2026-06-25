@@ -50,11 +50,11 @@ async function fetchMissingPosters() {
         .from('movies')
         .update({ poster_url: posterUrl })
         .eq('id', movie.id);
-      // Update local state
       movie.poster_url = posterUrl;
-      // Re-render that card
       renderMovies();
     }
+    // 2 second delay between each request
+    await new Promise(r => setTimeout(r, 2000));
   }
   console.log('Poster fetch complete!');
 }
@@ -107,6 +107,8 @@ async function fetchMoviePoster(title) {
         console.log('Poster found:', page.thumbnail.source);
         return page.thumbnail.source;
       }
+      // Small delay before next attempt
+      await new Promise(r => setTimeout(r, 1000));
     } catch {
       continue;
     }
