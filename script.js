@@ -130,12 +130,13 @@ function getGenreColor(genre) {
 
 // ===== FILTER BY GENRE =====
 function filterByGenre(genre) {
+  console.log("Genre clicked:", genre);
+
   activeGenre = genre;
   activeStatus = 'All';
+
   document.getElementById('filterGenreTop').value = genre;
-  document.getElementById('sectionTitle').textContent =
-    genre === 'All' ? 'All Movies' : `${getGenreIcon(genre)} ${genre}`;
-  setActiveNav(genre);
+
   renderMovies();
   updateGenreChart();
 }
