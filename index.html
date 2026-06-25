@@ -3,75 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎬 Movie Watch List</title>
+  <title>🎬 CineTrack</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#c084fc" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#00d4aa" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="CineTrack" />
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="header-inner">
-      <div class="logo">🎬 CineTrack</div>
-      <div class="header-btns">
-        <span class="user-email" id="userEmail"></span>
-        <button class="btn-bulk" onclick="document.getElementById('csvFileInput').click()">📁 Import CSV</button>
-        <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCSVUpload(event)" />
-        <button class="btn-add" onclick="openModal()">+ Add Movie</button>
-        <button class="btn-logout" onclick="handleLogout()">Logout</button>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">🎬</span>
+      <span class="logo-text">CineTrack</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">MENU</div>
+      <a class="nav-item active" onclick="filterByStatus('All')">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" onclick="openModal()">
+        <span class="nav-icon">➕</span>
+        <span>Add Movie</span>
+      </a>
+      <a class="nav-item" onclick="document.getElementById('csvFileInput').click()">
+        <span class="nav-icon">📁</span>
+        <span>Import CSV</span>
+      </a>
+      <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCSVUpload(event)" />
+
+      <div class="nav-section-label" style="margin-top:24px">STATUS</div>
+      <a class="nav-item" onclick="filterByStatus('Watched')">
+        <span class="nav-icon">✅</span>
+        <span>Watched</span>
+        <span class="nav-badge" id="watchedBadge">0</span>
+      </a>
+      <a class="nav-item" onclick="filterByStatus('Unwatched')">
+        <span class="nav-icon">🎞</span>
+        <span>Unwatched</span>
+        <span class="nav-badge" id="unwatchedBadge">0</span>
+      </a>
+
+      <div class="nav-section-label" style="margin-top:24px">GENRES</div>
+      <a class="nav-item" onclick="filterByGenre('All')"><span class="nav-icon">🎬</span><span>All</span></a>
+      <a class="nav-item" onclick="filterByGenre('Action')"><span class="nav-icon">💥</span><span>Action</span></a>
+      <a class="nav-item" onclick="filterByGenre('Comedy')"><span class="nav-icon">😂</span><span>Comedy</span></a>
+      <a class="nav-item" onclick="filterByGenre('Drama')"><span class="nav-icon">🎭</span><span>Drama</span></a>
+      <a class="nav-item" onclick="filterByGenre('Horror')"><span class="nav-icon">👻</span><span>Horror</span></a>
+      <a class="nav-item" onclick="filterByGenre('Romance')"><span class="nav-icon">❤️</span><span>Romance</span></a>
+      <a class="nav-item" onclick="filterByGenre('Sci-Fi')"><span class="nav-icon">🚀</span><span>Sci-Fi</span></a>
+      <a class="nav-item" onclick="filterByGenre('Thriller')"><span class="nav-icon">🔪</span><span>Thriller</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <div class="user-details">
+          <span class="user-email" id="userEmail">Loading...</span>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-search">
+        <span>🔍</span>
+        <input type="text" id="searchInput" placeholder="Search movies..." oninput="renderMovies()" />
+      </div>
+      <button class="btn-add-top" onclick="openModal()">+ New Movie</button>
+    </div>
+
+    <!-- BANNER -->
+    <div id="importBanner" style="display:none"></div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num" id="totalCount">0</div>
+        <div class="stat-label">Total Movies</div>
+      </div>
+      <div class="stat-box green">
+        <div class="stat-num" id="watchedCount">0</div>
+        <div class="stat-label">Watched</div>
+      </div>
+      <div class="stat-box orange">
+        <div class="stat-num" id="unwatchedCount">0</div>
+        <div class="stat-label">Unwatched</div>
+      </div>
+      <div class="stat-box purple">
+        <div class="stat-num" id="ratingAvg">0</div>
+        <div class="stat-label">Avg Rating</div>
       </div>
     </div>
-  </header>
 
-  <!-- SEARCH & FILTER -->
-  <div class="controls">
-    <input type="text" id="searchInput" placeholder="🔍 Search movies..." oninput="renderMovies()" />
-    <select id="filterGenre" onchange="renderMovies()">
-      <option value="All">All Genres</option>
-      <option value="Action">Action</option>
-      <option value="Comedy">Comedy</option>
-      <option value="Drama">Drama</option>
-      <option value="Horror">Horror</option>
-      <option value="Romance">Romance</option>
-      <option value="Sci-Fi">Sci-Fi</option>
-      <option value="Thriller">Thriller</option>
-    </select>
-    <select id="filterStatus" onchange="renderMovies()">
-      <option value="All">All Status</option>
-      <option value="Watched">Watched</option>
-      <option value="Unwatched">Unwatched</option>
-    </select>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat-card">
-      <span id="totalCount">0</span>
-      <label>Total</label>
+    <!-- SECTION TITLE -->
+    <div class="section-header">
+      <h2 id="sectionTitle">All Movies</h2>
+      <select id="filterGenreTop" onchange="renderMovies()" class="top-filter">
+        <option value="All">All Genres</option>
+        <option value="Action">💥 Action</option>
+        <option value="Comedy">😂 Comedy</option>
+        <option value="Drama">🎭 Drama</option>
+        <option value="Horror">👻 Horror</option>
+        <option value="Romance">❤️ Romance</option>
+        <option value="Sci-Fi">🚀 Sci-Fi</option>
+        <option value="Thriller">🔪 Thriller</option>
+      </select>
     </div>
-    <div class="stat-card watched-stat">
-      <span id="watchedCount">0</span>
-      <label>Watched</label>
-    </div>
-    <div class="stat-card unwatched-stat">
-      <span id="unwatchedCount">0</span>
-      <label>Unwatched</label>
-    </div>
-  </div>
 
-  <!-- IMPORT STATUS BANNER -->
-  <div id="importBanner" style="display:none"></div>
-
-  <!-- MOVIE GRID -->
-  <main>
+    <!-- MOVIE GRID -->
     <div class="movie-grid" id="movieGrid"></div>
-    <div class="empty-state" id="emptyState" style="display:none;">
-      <p>🎥 No movies yet!</p>
-      <span>Click "+ Add Movie" or "📁 Import CSV" to get started</span>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <p>🎥</p>
+      <h3>No movies yet!</h3>
+      <span>Click "+ New Movie" or "📁 Import CSV" to get started</span>
     </div>
+
   </main>
 
   <!-- ADD/EDIT MODAL -->
@@ -82,22 +138,18 @@
         <button class="close-btn" onclick="closeModal()">✕</button>
       </div>
       <div class="modal-body">
-        <input type="hidden" id="movieId" />
-
         <label>Movie Title *</label>
         <input type="text" id="movieTitle" placeholder="e.g. Vikram" />
-
         <label>Genre</label>
         <select id="movieGenre">
-          <option value="Action">Action</option>
-          <option value="Comedy">Comedy</option>
-          <option value="Drama">Drama</option>
-          <option value="Horror">Horror</option>
-          <option value="Romance">Romance</option>
-          <option value="Sci-Fi">Sci-Fi</option>
-          <option value="Thriller">Thriller</option>
+          <option value="Action">💥 Action</option>
+          <option value="Comedy">😂 Comedy</option>
+          <option value="Drama">🎭 Drama</option>
+          <option value="Horror">👻 Horror</option>
+          <option value="Romance">❤️ Romance</option>
+          <option value="Sci-Fi">🚀 Sci-Fi</option>
+          <option value="Thriller">🔪 Thriller</option>
         </select>
-
         <label>Rating</label>
         <div class="star-input" id="starInput">
           <span onclick="setRating(1)">★</span>
@@ -106,7 +158,6 @@
           <span onclick="setRating(4)">★</span>
           <span onclick="setRating(5)">★</span>
         </div>
-
         <label>Status</label>
         <div class="toggle-row">
           <span>Unwatched</span>
@@ -116,7 +167,6 @@
           </label>
           <span>Watched</span>
         </div>
-
         <label>Notes (optional)</label>
         <textarea id="movieNotes" placeholder="Your thoughts..."></textarea>
       </div>
