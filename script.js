@@ -48,6 +48,20 @@ async function loadMovies() {
   renderMovies();
 }
 
+// ===== WIKIPEDIA POSTER SEARCH =====
+async function fetchMoviePoster(title) {
+  try {
+    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=400&origin=*`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const pages = data.query.pages;
+    const page = Object.values(pages)[0];
+    return page.thumbnail ? page.thumbnail.source : null;
+  } catch {
+    return null;
+  }
+}
+
 // ===== GENRE ICONS & COLORS =====
 function getGenreIcon(genre) {
   const icons = {
@@ -190,11 +204,13 @@ function createCard(movie) {
 
   const icon = getGenreIcon(movie.genre);
   const color = getGenreColor(movie.genre);
+  const posterContent = movie.poster_url
+    ? `<img src="${movie.poster_url}" alt="${movie.title}" style="width:100%;height:100%;object-fit:cover;border-radius:0" onerror="this.parentElement.innerHTML='<span style=font-size:3rem>${icon}</span>'" />`
+    : `<div class="card-poster-bg">${icon}</div><span style="font-size:3rem;position:relative;z-index:1">${icon}</span>`;
 
   card.innerHTML = `
     <div class="card-poster" style="background: linear-gradient(135deg, ${color}22, ${color}11)">
-      <div class="card-poster-bg">${icon}</div>
-      <span style="font-size:3rem;position:relative;z-index:1">${icon}</span>
+      ${posterContent}
       <span class="card-watched-badge ${movie.watched ? 'badge-watched' : 'badge-unwatched'}">
         ${movie.watched ? '✅ Watched' : '🎞 Unwatched'}
       </span>
@@ -278,8 +294,11 @@ async function saveMovie() {
     return;
   }
 
+  const posterUrl = await fetchMoviePoster(title);
+
   const movieData = {
     title, genre, notes, watched, rating: currentRating, user_id: currentUser.id,
+    poster_url: posterUrl,
     date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
   };
 
