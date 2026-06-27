@@ -215,6 +215,23 @@ body {
   white-space: nowrap;
   transition: opacity 0.2s;
 }
+.theme-toggle{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:var(--card);
+    border:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-size:20px;
+    transition:.3s;
+}
+
+.theme-toggle:hover{
+    transform:scale(1.08);
+}
 
 .btn-add-top:hover { opacity: 0.9; }
 .theme-btn{
@@ -654,27 +671,8 @@ input:checked + .slider::before { transform: translateX(20px); }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .movie-grid { grid-template-columns: repeat(2, 1fr); }
 }
-body.light{
-  --bg:#f4f6fb;
-  --surface:#ffffff;
-  --card:#ffffff;
-  --border:#dcdcdc;
-  --text:#222;
-  --muted:#666;
-}
-/* ===== LIGHT THEME ===== */
-[data-theme="light"] {
-  --bg: #f0f2f5;
-  --surface: #ffffff;
-  --card: #ffffff;
-  --border: #e2e8f0;
-  --text: #1a202c;
-  --muted: #64748b;
-}
 
-[data-theme="light"] .sidebar { box-shadow: 2px 0 8px rgba(0,0,0,0.08); }
-[data-theme="light"] .movie-card { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-[data-theme="light"] .topbar { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+/* ===== LIGHT THEME ===== */
 
 /* ===== FOOTER ACTIONS ===== */
 .footer-actions {
@@ -729,19 +727,6 @@ body.light{
 .stat-box:hover { border-color: var(--accent); transform: translateY(-2px); transition: all 0.2s; }
 
 /* ===== LIGHT THEME ===== */
-[data-theme="light"] {
-  --bg: #f0f2f5;
-  --surface: #ffffff;
-  --card: #ffffff;
-  --border: #e2e8f0;
-  --text: #1a202c;
-  --muted: #64748b;
-}
-
-[data-theme="light"] .sidebar { box-shadow: 2px 0 12px rgba(0,0,0,0.08); }
-[data-theme="light"] .movie-card { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-[data-theme="light"] .topbar { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-[data-theme="light"] .topbar-search { background: var(--bg); }
 
 /* ===== FOOTER BUTTONS ===== */
 .footer-btns {
@@ -765,4 +750,25 @@ body.light{
 .btn-icon:hover {
   background: rgba(0,212,170,0.1);
   border-color: var(--accent);
+}
+/* ===== LIGHT THEME ===== */
+
+body.light{
+    --bg:#f5f7fb;
+    --surface:#ffffff;
+    --card:#ffffff;
+    --border:#dddddd;
+    --text:#222;
+    --muted:#666;
+}
+
+body.light .sidebar,
+body.light .topbar,
+body.light .movie-card,
+body.light .modal{
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+body.light .topbar-search{
+    background:#f7f7f7;
 }
