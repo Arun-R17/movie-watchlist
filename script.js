@@ -15,27 +15,37 @@ let activeStatus = 'All';
 
 
 // ===== SHARE LIST =====
-function shareList() {
-  const shareUrl = window.location.href;
-  document.getElementById('shareLink').value = shareUrl;
-  document.getElementById('shareOverlay').classList.add('active');
+async function shareList() {
+
+    const shareUrl =
+    `https://arun-r17.github.io/movie-watchlist/?user=${currentUser.id}`;
+
+    if (navigator.share) {
+
+        try {
+
+            await navigator.share({
+                title: "🎬 My Movie Watchlist",
+                text: "Check out my movie collection!",
+                url: shareUrl
+            });
+
+        } catch (err) {
+            console.log(err);
+        }
+
+    } else {
+
+        navigator.clipboard.writeText(shareUrl);
+
+        showBanner("✅ Link Copied!", "success");
+
+    }
+
 }
 
-function copyShareLink() {
-  const link = document.getElementById('shareLink').value;
-  navigator.clipboard.writeText(link).then(() => {
-    showBanner('✅ Link copied! Share பண்ணுங்க! 🎬', 'success');
-    closeShare();
-  }).catch(() => {
-    document.getElementById('shareLink').select();
-    document.execCommand('copy');
-    showBanner('✅ Link copied!', 'success');
-    closeShare();
-  });
-}
 
-function closeShare() { document.getElementById('shareOverlay').classList.remove('active'); }
-function closeShareOutside(e) { if (e.target.id === 'shareOverlay') closeShare(); }
+
 
 // ===== SIDEBAR TOGGLE =====
 function toggleSidebar() {
