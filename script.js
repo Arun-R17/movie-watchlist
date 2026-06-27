@@ -21,22 +21,22 @@ let activeStatus = 'All';
 // ===== SHARE LIST =====
 async function shareList() {
 
+    const { data } = await _supabase
+        .from("profiles")
+        .select("share_token")
+        .eq("id", currentUser.id)
+        .single();
+
     const shareUrl =
-    `https://arun-r17.github.io/movie-watchlist/?user=${currentUser.id}`;
+    `https://arun-r17.github.io/movie-watchlist/share.html?token=${data.share_token}`;
 
     if (navigator.share) {
 
-        try {
-
-            await navigator.share({
-                title: "🎬 My Movie Watchlist",
-                text: "Check out my movie collection!",
-                url: shareUrl
-            });
-
-        } catch (err) {
-            console.log(err);
-        }
+        await navigator.share({
+            title: "🎬 My Movie Watchlist",
+            text: "Check out my movie collection!",
+            url: shareUrl
+        });
 
     } else {
 
@@ -62,6 +62,18 @@ async function checkAuth() {
   const { data } = await _supabase.auth.getSession();
   if (!data.session) { window.location.href = 'login.html'; return; }
   currentUser = data.session.user;
+    const { data: profile } = await _supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", currentUser.id)
+      .single();
+
+    if (!profile) {
+      await _supabase.from("profiles").insert({
+        id: currentUser.id,
+        share_token: crypto.randomUUID()
+      });
+    }
   const email = currentUser.email || '';
   document.getElementById('userEmail').textContent = email;
   document.getElementById('userAvatar').textContent = email.charAt(0).toUpperCase();
