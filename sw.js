@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cinetrack-v6';
+const CACHE_NAME = 'cinetrack-v5';
 const ASSETS = [
   '/movie-watchlist/',
   '/movie-watchlist/index.html',
