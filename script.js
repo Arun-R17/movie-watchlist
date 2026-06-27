@@ -364,3 +364,28 @@ document.addEventListener('keydown', e => {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => checkAuth());
+
+function toggleTheme(){
+
+    document.body.classList.toggle("light");
+
+    const btn=document.getElementById("themeToggle");
+
+    if(document.body.classList.contains("light")){
+        btn.textContent="🌙";
+        localStorage.setItem("theme","light");
+    }else{
+        btn.textContent="☀️";
+        localStorage.setItem("theme","dark");
+    }
+
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+
+    if(localStorage.getItem("theme")==="light"){
+        document.body.classList.add("light");
+        document.getElementById("themeToggle").textContent="🌙";
+    }
+
+});
