@@ -351,11 +351,22 @@ async function saveMovie() {
     return;
   }
   const posterUrl = await fetchMoviePoster(title);
-  const movieData = {
-    title, genre, notes, watched, rating: currentRating, user_id: currentUser.id,
-    poster_url: posterUrl,
-    date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
-  };
+  
+    const movieData = {
+        title,
+        genre,
+        notes,
+        watched,
+        rating: currentRating,
+        user_id: currentUser.id,
+        poster_url: posterUrl,
+        share_token: crypto.randomUUID(),
+        date: new Date().toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        })
+    };
   if (editingId) {
     const { error } = await _supabase.from('movies').update(movieData).eq('id', editingId);
     if (error) { console.error(error); return; }
