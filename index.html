@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -21,9 +21,13 @@
 
     <nav class="sidebar-nav">
       <div class="nav-section-label">MENU</div>
-      <a class="nav-item active" onclick="filterByStatus('All')">
+      <a class="nav-item active" id="nav-all" onclick="filterByStatus('All')">
         <span class="nav-icon">🏠</span>
         <span>Dashboard</span>
+      </a>
+      <a class="nav-item" id="nav-toprated" onclick="filterByStatus('TopRated')">
+        <span class="nav-icon">⭐</span>
+        <span>Top Rated</span>
       </a>
       <a class="nav-item" onclick="openModal()">
         <span class="nav-icon">➕</span>
@@ -36,12 +40,12 @@
       <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCSVUpload(event)" />
 
       <div class="nav-section-label" style="margin-top:24px">STATUS</div>
-      <a class="nav-item" onclick="filterByStatus('Watched')">
+      <a class="nav-item" id="nav-watched" onclick="filterByStatus('Watched')">
         <span class="nav-icon">✅</span>
         <span>Watched</span>
         <span class="nav-badge" id="watchedBadge">0</span>
       </a>
-      <a class="nav-item" onclick="filterByStatus('Unwatched')">
+      <a class="nav-item" id="nav-unwatched" onclick="filterByStatus('Unwatched')">
         <span class="nav-icon">🎞</span>
         <span>Unwatched</span>
         <span class="nav-badge" id="unwatchedBadge">0</span>
@@ -65,7 +69,11 @@
           <span class="user-email" id="userEmail">Loading...</span>
         </div>
       </div>
-      <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
+      <div class="footer-btns">
+        <button class="btn-icon" onclick="toggleTheme()" title="Toggle Theme" id="themeBtn">🌙</button>
+        <button class="btn-icon" onclick="shareList()" title="Share List">📱</button>
+        <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
+      </div>
     </div>
   </aside>
 
@@ -82,19 +90,9 @@
       <button class="btn-add-top" onclick="openModal()">+ New Movie</button>
     </div>
 
-
     <!-- BANNER -->
     <div id="importBanner" style="display:none"></div>
-    <div class="hero-banner">
-      <div class="hero-content">
-        <h1>🎬 Welcome Back</h1>
-        <p>Track your favorite movies and build your personal collection.</p>
-      </div>
-    </div>
-    <div class="recent-section">
-      <h2>👀 Recently Viewed</h2>
-      <div id="recentMovies" class="recent-row"></div>
-    </div>
+
     <!-- STATS -->
     <div class="stats-row">
       <div class="stat-box">
@@ -113,14 +111,6 @@
         <div class="stat-num" id="ratingAvg">0</div>
         <div class="stat-label">Avg Rating</div>
       </div>
-    </div>
-    <div class="top-rated-section">
-      <h2>🏆 Top Rated Movies</h2>
-      <div id="topRatedMovies"></div>
-    </div>
-    <div class="chart-section">
-      <h2>📊 Genre Distribution</h2>
-      <canvas id="genreChart"></canvas>
     </div>
 
     <!-- SECTION TITLE -->
@@ -147,6 +137,26 @@
     </div>
 
   </main>
+
+  <!-- SHARE MODAL -->
+  <div class="modal-overlay" id="shareOverlay" onclick="closeShareOutside(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>📱 Share Movie List</h2>
+        <button class="close-btn" onclick="closeShare()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label>Share Link</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="shareLink" readonly style="flex:1;font-size:0.78rem" />
+          <button class="btn-save" style="flex:0;white-space:nowrap;padding:10px 16px" onclick="copyShareLink()">Copy</button>
+        </div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:12px;text-align:center">
+          இந்த link யாரையாவது share பண்ணுங்க! 🎬
+        </p>
+      </div>
+    </div>
+  </div>
 
   <!-- ADD/EDIT MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
@@ -204,24 +214,5 @@
         .catch(err => console.log('SW error:', err));
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
-  <div id="movieDetailModal" class="movie-detail-modal">
-  <div class="movie-detail-content">
-    <span class="close-detail" onclick="closeMovieDetail()">&times;</span>
-
-    <img id="detailPoster" src="" alt="Movie Poster">
-
-    <h2 id="detailTitle"></h2>
-
-    <div id="detailGenre"></div>
-
-    <div id="detailRating"></div>
-
-    <div id="detailStatus"></div>
-
-    <p id="detailNotes"></p>
-  </div>
-</div>
 </body>
 </html>
