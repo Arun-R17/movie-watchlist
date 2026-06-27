@@ -144,25 +144,7 @@
 
   </main>
 
-  <!-- SHARE MODAL -->
-  <div class="modal-overlay" id="shareOverlay" onclick="closeShareOutside(event)">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>📱 Share Movie List</h2>
-        <button class="close-btn" onclick="closeShare()">✕</button>
-      </div>
-      <div class="modal-body">
-        <label>Share Link</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" id="shareLink" readonly style="flex:1;font-size:0.78rem" />
-          <button class="btn-save" style="flex:0;white-space:nowrap;padding:10px 16px" onclick="copyShareLink()">Copy</button>
-        </div>
-        <p style="font-size:0.8rem;color:var(--muted);margin-top:12px;text-align:center">
-          இந்த link யாரையாவது share பண்ணுங்க! 🎬
-        </p>
-      </div>
-    </div>
-  </div>
+  
 
   <!-- ADD/EDIT MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
