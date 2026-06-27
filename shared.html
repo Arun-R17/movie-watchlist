@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared Movie List - CineTrack</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="main-content" style="margin-left:0">
+
+    <div class="topbar">
+      <h2>🎬 Shared Movie List</h2>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num" id="totalCount">0</div>
+        <div class="stat-label">Movies</div>
+      </div>
+    </div>
+
+    <div class="movie-grid" id="movieGrid"></div>
+
+    <div class="empty-state" id="emptyState" style="display:none">
+      <p>🎥</p>
+      <h3>No shared movies found</h3>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="shared.js"></script>
+
+</body>
+</html>
