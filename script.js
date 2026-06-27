@@ -28,7 +28,7 @@ async function shareList() {
         .single();
 
     const shareUrl =
-    `https://arun-r17.github.io/movie-watchlist/share.html?token=${data.share_token}`;
+    `https://arun-r17.github.io/movie-watchlist/shared.html?token=${data.share_token}`;
 
     if (navigator.share) {
 
@@ -117,7 +117,7 @@ async function fetchMissingPosters() {
 async function loadMovies() {
   const { data, error } = await _supabase
     .from('movies')
-    .select('*')
+    .select('*, share_id')
     .eq('user_id', currentUser.id)
     .order('id', { ascending: false });
   if (error) { console.error('Load error:', error); return; }
