@@ -87,7 +87,13 @@
         <span>🔍</span>
         <input type="text" id="searchInput" placeholder="Search movies..." oninput="renderMovies()" />
       </div>
-      <button class="btn-add-top" onclick="openModal()">+ New Movie</button>
+      <button id="themeToggle" class="theme-btn" onclick="toggleTheme()">
+          ☀️
+      </button>
+
+      <button class="btn-add-top" onclick="openModal()">
+          + New Movie
+      </button>
     </div>
 
     <!-- BANNER -->
