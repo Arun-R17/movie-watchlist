@@ -4,6 +4,10 @@ const SUPABASE_KEY = 'sb_publishable_b4kOwdEzwx3ovnYlIqPvTQ_5Lnqa9Iq';
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ===== STATE =====
+const urlParams = new URLSearchParams(window.location.search);
+const sharedUserId = urlParams.get("user");
+const isSharedPage = !!sharedUserId;
+
 let movies = [];
 let currentRating = 0;
 let editingId = null;
@@ -61,7 +65,19 @@ async function checkAuth() {
   const email = currentUser.email || '';
   document.getElementById('userEmail').textContent = email;
   document.getElementById('userAvatar').textContent = email.charAt(0).toUpperCase();
-  await loadMovies();
+  
+    if (isSharedPage) {
+        await loadSharedMovies(sharedUserId);
+    } else {
+        await loadMovies();
+    }
+    if (isSharedPage) {
+
+    document.querySelector(".btn-add-top").style.display = "none";
+
+    document.querySelector(".btn-logout").style.display = "none";
+
+    }
 }
 
 // ===== LOGOUT =====
@@ -96,6 +112,22 @@ async function loadMovies() {
   movies = data || [];
   renderMovies();
   fetchMissingPosters();
+}
+async function loadSharedMovies(userId) {
+
+    const { data, error } = await _supabase
+        .from("movies")
+        .select("*")
+        .eq("user_id", userId)
+        .order("id", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    movies = data || [];
+    renderMovies();
 }
 
 // ===== FETCH MOVIE POSTER =====
