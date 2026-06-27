@@ -12,7 +12,20 @@ let activeGenre = 'All';
 let activeStatus = 'All';
 
 // ===== THEME TOGGLE =====
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('cinetrack-theme', isDark ? 'light' : 'dark');
+}
 
+function loadTheme() {
+  const saved = localStorage.getItem('cinetrack-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = saved === 'dark' ? '🌙' : '☀️';
+}
 
 // ===== SHARE LIST =====
 function shareList() {
