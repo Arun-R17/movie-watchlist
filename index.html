@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -21,28 +21,30 @@
 
     <nav class="sidebar-nav">
       <div class="nav-section-label">MENU</div>
-      <a class="nav-item active" id="nav-dashboard" onclick="showSection('all')">
-        <span class="nav-icon">🏠</span><span>Dashboard</span>
-      </a>
-      <a class="nav-item" id="nav-toprated" onclick="showSection('toprated')">
-        <span class="nav-icon">⭐</span><span>Top Rated</span>
+      <a class="nav-item active" onclick="filterByStatus('All')">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
       </a>
       <a class="nav-item" onclick="openModal()">
-        <span class="nav-icon">➕</span><span>Add Movie</span>
+        <span class="nav-icon">➕</span>
+        <span>Add Movie</span>
       </a>
       <a class="nav-item" onclick="document.getElementById('csvFileInput').click()">
-        <span class="nav-icon">📁</span><span>Import CSV</span>
+        <span class="nav-icon">📁</span>
+        <span>Import CSV</span>
       </a>
       <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCSVUpload(event)" />
 
       <div class="nav-section-label" style="margin-top:24px">STATUS</div>
-      <a class="nav-item" id="nav-watchlist" onclick="showSection('watchlist')">
-        <span class="nav-icon">📋</span><span>Watchlist</span>
-        <span class="nav-badge" id="watchlistBadge">0</span>
-      </a>
-      <a class="nav-item" id="nav-watched" onclick="showSection('watched')">
-        <span class="nav-icon">✅</span><span>Watched</span>
+      <a class="nav-item" onclick="filterByStatus('Watched')">
+        <span class="nav-icon">✅</span>
+        <span>Watched</span>
         <span class="nav-badge" id="watchedBadge">0</span>
+      </a>
+      <a class="nav-item" onclick="filterByStatus('Unwatched')">
+        <span class="nav-icon">🎞</span>
+        <span>Unwatched</span>
+        <span class="nav-badge" id="unwatchedBadge">0</span>
       </a>
 
       <div class="nav-section-label" style="margin-top:24px">GENRES</div>
@@ -59,13 +61,11 @@
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="userAvatar">U</div>
-        <div class="user-email" id="userEmail">Loading...</div>
+        <div class="user-details">
+          <span class="user-email" id="userEmail">Loading...</span>
+        </div>
       </div>
-      <div class="footer-actions">
-        <button class="btn-theme" onclick="toggleTheme()" title="Toggle Theme">🌙</button>
-        <button class="btn-share" onclick="shareList()" title="Share List">📱</button>
-        <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
-      </div>
+      <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
     </div>
   </aside>
 
@@ -82,44 +82,60 @@
       <button class="btn-add-top" onclick="openModal()">+ New Movie</button>
     </div>
 
+
     <!-- BANNER -->
     <div id="importBanner" style="display:none"></div>
-
+    <div class="hero-banner">
+      <div class="hero-content">
+        <h1>🎬 Welcome Back</h1>
+        <p>Track your favorite movies and build your personal collection.</p>
+      </div>
+    </div>
+    <div class="recent-section">
+      <h2>👀 Recently Viewed</h2>
+      <div id="recentMovies" class="recent-row"></div>
+    </div>
     <!-- STATS -->
     <div class="stats-row">
-      <div class="stat-box" onclick="showSection('all')">
+      <div class="stat-box">
         <div class="stat-num" id="totalCount">0</div>
         <div class="stat-label">Total Movies</div>
       </div>
-      <div class="stat-box green" onclick="showSection('watched')">
+      <div class="stat-box green">
         <div class="stat-num" id="watchedCount">0</div>
         <div class="stat-label">Watched</div>
       </div>
-      <div class="stat-box orange" onclick="showSection('watchlist')">
+      <div class="stat-box orange">
         <div class="stat-num" id="unwatchedCount">0</div>
-        <div class="stat-label">Watchlist</div>
+        <div class="stat-label">Unwatched</div>
       </div>
-      <div class="stat-box purple" onclick="showSection('toprated')">
-        <div class="stat-num" id="ratingAvg">0⭐</div>
+      <div class="stat-box purple">
+        <div class="stat-num" id="ratingAvg">0</div>
         <div class="stat-label">Avg Rating</div>
       </div>
+    </div>
+    <div class="top-rated-section">
+      <h2>🏆 Top Rated Movies</h2>
+      <div id="topRatedMovies"></div>
+    </div>
+    <div class="chart-section">
+      <h2>📊 Genre Distribution</h2>
+      <canvas id="genreChart"></canvas>
     </div>
 
     <!-- SECTION TITLE -->
     <div class="section-header">
       <h2 id="sectionTitle">All Movies</h2>
-      <div style="display:flex;gap:10px;align-items:center">
-        <select id="filterGenreTop" onchange="renderMovies()" class="top-filter">
-          <option value="All">All Genres</option>
-          <option value="Action">💥 Action</option>
-          <option value="Comedy">😂 Comedy</option>
-          <option value="Drama">🎭 Drama</option>
-          <option value="Horror">👻 Horror</option>
-          <option value="Romance">❤️ Romance</option>
-          <option value="Sci-Fi">🚀 Sci-Fi</option>
-          <option value="Thriller">🔪 Thriller</option>
-        </select>
-      </div>
+      <select id="filterGenreTop" onchange="renderMovies()" class="top-filter">
+        <option value="All">All Genres</option>
+        <option value="Action">💥 Action</option>
+        <option value="Comedy">😂 Comedy</option>
+        <option value="Drama">🎭 Drama</option>
+        <option value="Horror">👻 Horror</option>
+        <option value="Romance">❤️ Romance</option>
+        <option value="Sci-Fi">🚀 Sci-Fi</option>
+        <option value="Thriller">🔪 Thriller</option>
+      </select>
     </div>
 
     <!-- MOVIE GRID -->
@@ -131,27 +147,6 @@
     </div>
 
   </main>
-
-  <!-- SHARE MODAL -->
-  <div class="modal-overlay" id="shareModal" onclick="closeShareModal(event)">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>📱 Share Movie List</h2>
-        <button class="close-btn" onclick="document.getElementById('shareModal').classList.remove('active')">✕</button>
-      </div>
-      <div class="modal-body">
-        <label>Share Link</label>
-        <div style="display:flex;gap:8px">
-          <input type="text" id="shareLink" readonly style="flex:1;font-size:0.8rem" />
-          <button class="btn-save" style="flex:0;padding:10px 16px" onclick="copyShareLink()">Copy</button>
-        </div>
-        <div id="shareQR" style="text-align:center;margin-top:16px"></div>
-        <p style="font-size:0.8rem;color:var(--muted);text-align:center;margin-top:8px">
-          இந்த link யாரையாவது share பண்ணுங்க!
-        </p>
-      </div>
-    </div>
-  </div>
 
   <!-- ADD/EDIT MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
@@ -182,9 +177,13 @@
           <span onclick="setRating(5)">★</span>
         </div>
         <label>Status</label>
-        <div class="status-toggle">
-          <button class="status-btn active" id="btn-watchlist" onclick="setStatus('watchlist')">📋 Watchlist</button>
-          <button class="status-btn" id="btn-watched" onclick="setStatus('watched')">✅ Watched</button>
+        <div class="toggle-row">
+          <span>Unwatched</span>
+          <label class="toggle">
+            <input type="checkbox" id="movieWatched" />
+            <span class="slider"></span>
+          </label>
+          <span>Watched</span>
         </div>
         <label>Notes (optional)</label>
         <textarea id="movieNotes" placeholder="Your thoughts..."></textarea>
@@ -201,8 +200,28 @@
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/movie-watchlist/sw.js')
+        .then(() => console.log('SW registered!'))
         .catch(err => console.log('SW error:', err));
     }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <div id="movieDetailModal" class="movie-detail-modal">
+  <div class="movie-detail-content">
+    <span class="close-detail" onclick="closeMovieDetail()">&times;</span>
+
+    <img id="detailPoster" src="" alt="Movie Poster">
+
+    <h2 id="detailTitle"></h2>
+
+    <div id="detailGenre"></div>
+
+    <div id="detailRating"></div>
+
+    <div id="detailStatus"></div>
+
+    <p id="detailNotes"></p>
+  </div>
+</div>
 </body>
 </html>
