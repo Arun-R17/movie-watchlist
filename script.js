@@ -5,7 +5,7 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ===== STATE =====
 const urlParams = new URLSearchParams(window.location.search);
-const sharedUserId = urlParams.get("user");
+const sharedListId = urlParams.get("id");
 const isSharedPage = !!sharedUserId;
 
 let movies = [];
@@ -84,7 +84,7 @@ async function checkAuth() {
   document.getElementById('userAvatar').textContent = email.charAt(0).toUpperCase();
   
     if (isSharedPage) {
-        await loadSharedMovies(sharedUserId);
+        await loadSharedMovies(sharedlistId);
     } else {
         await loadMovies();
     }
@@ -122,7 +122,7 @@ async function fetchMissingPosters() {
 async function loadMovies() {
   const { data, error } = await _supabase
     .from('movies')
-    .select('*, share_id')
+    .select('*')
     .eq('user_id', currentUser.id)
     .order('id', { ascending: false });
   if (error) { console.error('Load error:', error); return; }
