@@ -217,6 +217,21 @@ body {
 }
 
 .btn-add-top:hover { opacity: 0.9; }
+.theme-btn{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:50%;
+    background:var(--card);
+    color:var(--text);
+    cursor:pointer;
+    font-size:20px;
+    transition:.3s;
+}
+
+.theme-btn:hover{
+    transform:rotate(180deg);
+}
 
 /* ===== STATS ===== */
 .stats-row {
@@ -639,7 +654,14 @@ input:checked + .slider::before { transform: translateX(20px); }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .movie-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
+body.light{
+  --bg:#f4f6fb;
+  --surface:#ffffff;
+  --card:#ffffff;
+  --border:#dcdcdc;
+  --text:#222;
+  --muted:#666;
+}
 /* ===== LIGHT THEME ===== */
 [data-theme="light"] {
   --bg: #f0f2f5;
