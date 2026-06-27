@@ -21,31 +21,36 @@ let activeStatus = 'All';
 // ===== SHARE LIST =====
 async function shareList() {
 
-    const { data } = await _supabase
-        .from("profiles")
-        .select("share_token")
-        .eq("id", currentUser.id)
-        .single();
+  const { data, error } = await _supabase
+    .from("shared_lists")
+    .insert({ user_id: currentUser.id })
+    .select()
+    .single();
 
-    const shareUrl =
-    `https://arun-r17.github.io/movie-watchlist/shared.html?token=${data.share_token}`;
+  if (error) {
+    showBanner("Share failed", "error");
+    return;
+  }
 
-    if (navigator.share) {
+  const listId = data.id;
 
-        await navigator.share({
-            title: "🎬 My Movie Watchlist",
-            text: "Check out my movie collection!",
-            url: shareUrl
-        });
+  // update all movies with this list id
+  await _supabase
+    .from("movies")
+    .update({ shared_list_id: listId })
+    .eq("user_id", currentUser.id);
 
-    } else {
+  const url = `${window.location.origin}/movie-watchlist/shared.html?id=${listId}`;
 
-        navigator.clipboard.writeText(shareUrl);
-
-        showBanner("✅ Link Copied!", "success");
-
-    }
-
+  if (navigator.share) {
+    await navigator.share({
+      title: "🎬 My Movie List",
+      url
+    });
+  } else {
+    navigator.clipboard.writeText(url);
+    showBanner("Link copied!", "success");
+  }
 }
 
 
