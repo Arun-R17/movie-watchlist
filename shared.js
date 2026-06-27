@@ -16,7 +16,7 @@ async function loadSharedMovies() {
   const { data, error } = await supabase
     .from("movies")
     .select("*")
-    .eq("share_id", shareId);
+    .eq("shared_list_id", shareId)
 
   if (error || !data.length) {
     document.getElementById("emptyState").style.display = "block";
